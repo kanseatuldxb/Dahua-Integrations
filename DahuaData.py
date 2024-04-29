@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 
 import sys
 import hashlib
@@ -102,31 +100,6 @@ class DahuaRpc(object):
         else:
             raise RequestError(str(r))
 
-    def get_traffic_info(self):
-        method = "RecordFinder.factory.create"
-
-        params = {
-            "name" : "TrafficSnapEventInfo"
-        }
-        r = self.request(method=method, params=params)
-        
-        if type(r['result']):
-            return r['result']
-        else:
-            raise RequestError(str(r))
-
-    def start_find(self,object_id):
-        method = "RecordFinder.startFind"
-        object_id = object_id
-        params = {
-            "condition" : {
-                "Time" : ["<>",1558925818,1759012218]
-            }
-        }
-        r = self.request(object_id=object_id,method=method, params=params)
-
-        if r['result'] is False:
-            raise RequestError(str(r))
 
     def do_find(self,object_id):
         method = "RecordFinder.doFind"
@@ -140,26 +113,6 @@ class DahuaRpc(object):
             raise RequestError(str(r))
         else:
             return r
-
-    def doSeekFind(self,object_id):
-        method = "RecordFinder.doSeekFind"
-        object_id = object_id
-        params = {"offset": 0, "count": 100}
-        r = self.request(object_id=object_id,method=method, params=params)
-
-        if r['result'] is False:
-            raise RequestError(str(r))
-        else:
-            return r
-            
-    def set_config(self, params):
-        """Set configurations."""
-
-        method = "configManager.setConfig"
-        r = self.request(method=method, params=params)
-
-        if r['result'] is False:
-            raise RequestError(str(r))
 
     def reboot(self):
         """Reboot the device."""
@@ -286,30 +239,8 @@ class DahuaRpc(object):
         if r['result'] is False:
             raise RequestError(str(r))
 
-    def get_split(self):
-        """Get display split mode."""
-
-        # Get object id
-        method = "split.factory.instance"
-        params = {'channel': 0}
-        r = self.request(method=method, params=params)
-        object_id = r['result']
-
-        # Get split mode
-        method = "split.getMode"
-        params = ""
-        r = self.request(method=method, params=params, object_id=object_id)
-
-        if r['result'] is False:
-            raise RequestError(str(r))
-
-        mode = int(r['params']['mode'][5:])
-        view = int(r['params']['group']) + 1
-
-        return mode, view
 
     def attach_event(self, event = []):
-        """Attach a event to current session"""
         method = "eventManager.attach"
         if(event is None):
             return
@@ -338,29 +269,6 @@ class DahuaRpc(object):
                     _callback(buffer)
                 buffer = ""
 
-    def set_split(self, mode, view):
-        """Set display split mode."""
-
-        if isinstance(mode, int):
-            mode = "Split{}".format(mode)
-        group = view - 1
-
-        # Get object id
-        method = "split.factory.instance"
-        params = {'channel': 0}
-        r = self.request(method=method, params=params)
-        object_id = r['result']
-
-        # Set split mode
-        method = "split.setMode"
-        params = {'displayType': "General",
-                  'workMode': "Local",
-                  'mode': mode,
-                  'group': group}
-        r = self.request(method=method, params=params, object_id=object_id)
-
-        if r['result'] is False:
-            raise RequestError(str(r))
 
 
 class LoginError(Exception):
@@ -370,11 +278,11 @@ class LoginError(Exception):
 class RequestError(Exception):
     pass
 
-dahua = DahuaRpc(host="192.168.4.115", username="admin", password="Adaa@123")
+dahua = DahuaRpc(host="<Your IP>", username="admin", password="<Your Password>")
 dahua.login()
 print(dahua.current_time())
-#dahua.keep_alive()
-#dahua.AddVehicle()
+dahua.keep_alive()
+dahua.AddVehicle()
 dahua.UpdateVehicle()
-#dahua.RemoveVehicle()
-#dahua.ListVehicle()
+dahua.RemoveVehicle()
+dahua.ListVehicle()
